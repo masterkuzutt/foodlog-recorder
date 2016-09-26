@@ -20,6 +20,8 @@ class FoodDataModel{
     }
 };
 
+
+// api requests
 function searchFoodData(searchword,cb,cbNodata){
     $.ajax({
       method: 'GET',
@@ -43,6 +45,8 @@ function searchFoodData(searchword,cb,cbNodata){
     .error();
 };
 
+// third value is place to store data
+// cb have to accept to arguments.
 function getReport(ndbno,cb) {
   $.ajax({
     method: "GET",
@@ -54,15 +58,18 @@ function getReport(ndbno,cb) {
       api_key : NDBAPIKEY
     }
   })
-  .done( function(data) {
+  .done( (data) => {
     cb(data);
   })
-  .error(function(data) {
+  .error((data) => {
   });
 };
 
+//*********
 //strorage functions
 function writeStorage(key,data){
+  // console.log(JSON.stringify(data));
+  console.log(data[0].date);
   window.localStorage.setItem(key,JSON.stringify(data));
 };
 
@@ -84,7 +91,8 @@ let viewModel = new class {
   constructor(){
     this.searchResult =ko.observableArray([]);
     this.foodData = ko.observableArray([]);
-    this.dailyRecode =ko.observableArray([]);
+    this.foodRecodeDay = ko.observableArray([]);
+    this.foodRecode =ko.observableArray([]);
   }
 
   init(){
@@ -96,13 +104,10 @@ let viewModel = new class {
   loadFoodData(){
     let key = "foodData";
     let data = readStorageData(key);
-    console.log(data);
-    // data.forEach( (data) => {
-    //   this.foodData.push(data);
-    // });
-  }
-
-  loadFoodRecode(){
+    // console.log(data);
+    data.forEach( (item) => {
+       this.foodData.push(item);
+    });
   }
 
   // binds to search Button
@@ -120,6 +125,23 @@ let viewModel = new class {
     );
   }
 
+
+  storeFoodData(item){
+    getReport(item.ndbno ,
+      (data) => {
+          let food = new  FoodDataModel();
+          food.basicData = data.report.food;
+          //[TODO] data format is defined by model. don't need to care structure of data here
+          food.nutritionData = data.report.food.nutrients
+          //[TODO] check if data is already exist or not. knockout has suitable method i guess
+          this.foodData.push(food);
+          writeStorage("foodData",this.foodData());
+      }
+    );
+
+  }
+
+
   createTmpFoodData(item){
     return {
       ndbno:item.ndbno,
@@ -128,26 +150,29 @@ let viewModel = new class {
     }
   }
 
-  storeFoodData(item){
-
-    getReport(item.ndbno , (data) => {
-
-      let food = new  FoodDataModel();
-      food.basicData = data.report.food;
-      food.nutritionData = data.report.food.nutrients
-      this.foodData.push(food);
-
-      writeStorage("foodData",foodData);
-
+  //food recode functions
+  loadFoodRecode(){
+    let key = "foodRecode";
+    let data = readStorageData(key);
+    let currentDate = UTIL.getCurrentDate();
+    data.forEach( (item) => {
+      if(item.date === currentDate){
+        this.foodRecode.push(item);
+      }
     });
+  }
+
+  searchFoodRecode(){
+
   }
 
   storeFoodRecode(item){
     // let today = "2016/09/01";
-    item.date = '2016/09/09'
+    item.date = UTIL.getCurrentDate();
     this.foodRecode.push(item);
-    writeStorage('foodRecode',JSON.stringify(this.foodRecode));
+    writeStorage('foodRecode',this.foodRecode());
   }
+
 
 }();
 

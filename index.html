@@ -17,7 +17,7 @@
     <div>
       <ul class="search-list" data-bind="template : { name:'search-data', foreach : searchResult}"></ul>
         <script type="text/html" id="search-data">
-          <li data-bind="click:$parent.storeFoodData.bind($data)" class="search-list-item">
+          <li data-bind="click:$parent.storeFoodData.bind($parent,$data)" class="search-list-item">
             <h2 data-bind="text : ndbno"></h2>
             <h3 data-bind="text : group"></h3>
             <p  data-bind="text : name"></p>
@@ -25,17 +25,25 @@
         </script>
     </div>
   </div>
+
   <div class="fooddata-container">
     <ul class="fooddata-list" data-bind="template : { name:'food-data', foreach : foodData}"></ul>
       <script type="text/html" id="food-data">
-        <li data-bind="click:$parent.storeFoodRecode.bind($data)" class="food-list-item">
+        <li data-bind="click:$parent.storeFoodRecode.bind($parent,$data)" class="fooddata-item">
           <span data-bind="text : ndbno"></span>
           <span><p  data-bind="text : name"></p></span>
         </li>
       </script>
   </div>
-  <div class="foodrecode-container">
 
+  <div class="foodrecode-container">
+    <ul class="foodrecoe-list" data-bind="template : { name:'food-recode', foreach : foodRecode}"></ul>
+      <script type="text/html" id="food-recode">
+        <li data-bind="" class="food-list-item">
+          <span data-bind="text : date"></span>
+          <span><p  data-bind="text : name"></p></span>
+        </li>
+      </script>
   </div>
 
 </div>
@@ -44,6 +52,8 @@
 <!-- <script src="libs/underscore-min.js"></script>
 <script src="libs/backbone-min.js"></script> -->
 <!-- <script src="https://maps.googleapis.com/maps/api/js?libraries=drawing,geometry,places&key=AIzaSyB7PN2MCfC9FyBlvHEpOx3jZXzDUOITBJM&v=3"></script> -->
+<script src="config.js"></script>
+<script src="util.js"></script>
 <script src="index.js"></script>
 
 </body>
