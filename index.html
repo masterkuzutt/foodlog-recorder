@@ -12,7 +12,7 @@
   <div class="search-container">
     <div>
       <input type="button" data-bind="click:searchFood" class="btn search-btn" id="search-food-btn">
-      <input type="text" name="" id="search-food-text">
+      <input type="text" data-bind="value:searchQuery,valueupdate:keyup" name="" id="search-food-text">
     </div>
     <div>
       <ul class="search-list" data-bind="template : { name:'search-data', foreach : searchResult}"></ul>

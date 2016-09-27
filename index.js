@@ -1,26 +1,5 @@
 const NDBURL = 'http://api.nal.usda.gov/ndb/';
 
-class FoodDataModel{
-    constructor (){
-      this.ndbno = "";
-      this.group = "";
-      this.name = "";
-    }
-    set basicData(item){
-      this.ndbno  = item.ndbno;
-      this.group =  item.group;
-      this.name  =  item.name;
-      this.nutrtions = [];
-    }
-
-    set nutritionData(itemList){
-      itemList.forEach((item) => {
-        this.nutrtions.push(item)
-      });
-    }
-};
-
-
 // api requests
 function searchFoodData(searchword,cb,cbNodata){
     $.ajax({
@@ -68,8 +47,6 @@ function getReport(ndbno,cb) {
 //*********
 //strorage functions
 function writeStorage(key,data){
-  // console.log(JSON.stringify(data));
-  console.log(data[0].date);
   window.localStorage.setItem(key,JSON.stringify(data));
 };
 
@@ -86,6 +63,28 @@ function readStorageData(key){
 };
 
 
+
+class FoodDataModel{
+    constructor (){
+      this.ndbno = "";
+      this.group = "";
+      this.name = "";
+    }
+    set basicData(item){
+      this.ndbno  = item.ndbno;
+      this.group =  item.group;
+      this.name  =  item.name;
+      this.nutrtions = [];
+    }
+
+    set nutritionData(itemList){
+      itemList.forEach((item) => {
+        this.nutrtions.push(item)
+      });
+    }
+};
+
+
 let viewModel = new class {
 
   constructor(){
@@ -93,6 +92,7 @@ let viewModel = new class {
     this.foodData = ko.observableArray([]);
     this.foodRecodeDay = ko.observableArray([]);
     this.foodRecode =ko.observableArray([]);
+    this.searchQuery = ko.observable("");
   }
 
   init(){
@@ -104,18 +104,20 @@ let viewModel = new class {
   loadFoodData(){
     let key = "foodData";
     let data = readStorageData(key);
-    // console.log(data);
-    data.forEach( (item) => {
-       this.foodData.push(item);
-    });
+
+    if (data !== null  && data.length > 0){
+      data.forEach( (item) => {
+         this.foodData.push(item);
+      });
+    }
   }
 
   // binds to search Button
   searchFood() {
     this.searchResult([]);
-    let searchWord = ($('#search-food-text').val());
+    // let searchWord = ($('#search-food-text').val());
 
-    searchFoodData(searchWord,
+    searchFoodData(this.searchQuery,
       (item)=>{
         this.searchResult.push(this.createTmpFoodData(item));
       },
@@ -155,11 +157,13 @@ let viewModel = new class {
     let key = "foodRecode";
     let data = readStorageData(key);
     let currentDate = UTIL.getCurrentDate();
-    data.forEach( (item) => {
-      if(item.date === currentDate){
-        this.foodRecode.push(item);
-      }
-    });
+    if ( data !== null && data.length > 0 ) {
+      data.forEach( (item) => {
+        if(item.date === currentDate){
+          this.foodRecode.push(item);
+        }
+      });
+    }
   }
 
   searchFoodRecode(){
