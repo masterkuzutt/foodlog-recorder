@@ -62,6 +62,14 @@ function readStorageData(key){
   return JSON.parse( window.localStorage.getItem(key));
 };
 
+function checkIfStorageData(key,data){
+
+}
+
+function deleteStorageData(key,data){
+  //[TODO] for now, this function update key by tempolary data due to localstorage limitation.
+  writeStorage(key,data);
+}
 
 
 class FoodDataModel{
@@ -93,6 +101,7 @@ let viewModel = new class {
     this.foodRecodeDay = ko.observableArray([]);
     this.foodRecode =ko.observableArray([]);
     this.searchQuery = ko.observable("");
+    this.selectedDate = ko.observable(UTIL.getCurrentDate());
   }
 
   init(){
@@ -134,15 +143,33 @@ let viewModel = new class {
           let food = new  FoodDataModel();
           food.basicData = data.report.food;
           //[TODO] data format is defined by model. don't need to care structure of data here
+
           food.nutritionData = data.report.food.nutrients
           //[TODO] check if data is already exist or not. knockout has suitable method i guess
+          // currently just checkup tempolary array on the view. because local storage doesn't have function to store multplue keys
+          for (let i = 0 ; i < this.foodData().length ; i++){
+            if ( this.foodData()[i].ndbno === food.ndbno ){
+              // console.log(i,item.ndbno,food.ndbno);
+              return;
+            }
+          }
+
           this.foodData.push(food);
           writeStorage("foodData",this.foodData());
+
       }
     );
 
   }
 
+  deleteFoodData(item){
+    //[TODO] for now, this function update key by tempolary data due to localstorage limitation.
+    console.log(this.foodData());
+    this.foodData.remove(item);
+    deleteStorageData('foodData',this.foodData())
+
+
+  }
 
   createTmpFoodData(item){
     return {
@@ -153,10 +180,14 @@ let viewModel = new class {
   }
 
   //food recode functions
-  loadFoodRecode(){
+  loadFoodRecode(dateStr){
     let key = "foodRecode";
     let data = readStorageData(key);
-    let currentDate = UTIL.getCurrentDate();
+    let currentDate = dateStr || UTIL.getCurrentDate();
+    this.foodRecode([]);
+
+    // this.selectedDate(currentDate);
+    // console.log("dateStr:",dateStr,"currentStr:",currentDate,"this.selectedDate:",this.selectedDate());
     if ( data !== null && data.length > 0 ) {
       data.forEach( (item) => {
         if(item.date === currentDate){
@@ -176,7 +207,14 @@ let viewModel = new class {
     this.foodRecode.push(item);
     writeStorage('foodRecode',this.foodRecode());
   }
-
+  deleteFoodRecode(item){
+    //[TODO] for now, this function update key by tempolary data due to localstorage limitation.
+    // it delete all the data except for current data on the screen. need update
+  
+    console.log(this.foodRecode());
+    this.foodRecode.remove(item);
+    deleteStorageData('foodRecode',this.foodRecode());
+  };
 
 }();
 

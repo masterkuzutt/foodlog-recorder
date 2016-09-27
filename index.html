@@ -8,6 +8,9 @@
 </head>
 <body>
 <div id="container">
+  <div class="header-container">
+    <h1>FoodLog Recorder</h1>
+  </div>
 
   <div class="search-container">
     <div>
@@ -32,16 +35,20 @@
         <li data-bind="click:$parent.storeFoodRecode.bind($parent,$data)" class="fooddata-item">
           <span data-bind="text : ndbno"></span>
           <span><p  data-bind="text : name"></p></span>
+          <button type="button" data-bind="click:$parent.deleteFoodData.bind($parent,$data)" class="btn delete-btin"></button>
         </li>
       </script>
   </div>
 
   <div class="foodrecode-container">
+    <input type="date" data-bind="value:selectedDate,valueupdate:'input',event:{change:loadFoodRecode($element.value)}" name="" class="foodrecode-date">
     <ul class="foodrecoe-list" data-bind="template : { name:'food-recode', foreach : foodRecode}"></ul>
       <script type="text/html" id="food-recode">
         <li data-bind="" class="food-list-item">
           <span data-bind="text : date"></span>
           <span><p  data-bind="text : name"></p></span>
+          <button type="button" data-bind="click:$parent.deleteFoodRecode.bind($parent,$data)" class="btn delete-btin"></button>
+        </li>
         </li>
       </script>
   </div>

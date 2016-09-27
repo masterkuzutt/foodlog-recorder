@@ -1,10 +1,11 @@
 const UTIL = {
+  convertDateToStr : (date) =>{
+    return date.toJSON().slice(0,10);
+  },
   getCurrentDate : () => {
     let date = new Date();
-    return [
-        date.getFullYear(),
-        date.getMonth() + 1,
-        date.getDate()
-      ].join( '/' );
-  }
+    // console.log(date);
+    return UTIL.convertDateToStr(date);
+
+  },
 };
