@@ -32,9 +32,11 @@
   <div class="fooddata-container">
     <ul class="fooddata-list" data-bind="template : { name:'food-data', foreach : foodData}"></ul>
       <script type="text/html" id="food-data">
-        <li data-bind="click:$parent.storeFoodRecode.bind($parent,$data)" class="fooddata-item">
-          <span data-bind="text : ndbno"></span>
-          <span><p  data-bind="text : name"></p></span>
+        <li class="fooddata-item">
+          <div data-bind="click:$parent.storeFoodRecode.bind($parent,$data)">
+            <span data-bind="text : ndbno"></span>
+            <span><p  data-bind="text : name"></p></span>
+          </div>
           <button type="button" data-bind="click:$parent.deleteFoodData.bind($parent,$data)" class="btn delete-btin"></button>
         </li>
       </script>
@@ -55,6 +57,7 @@
 
 </div>
 <script src="libs/jquery.min.js"></script>
+<script src="libs/localforage.min.js"></script>
 <script src="libs/knockout-3.2.0.js"></script>
 <!-- <script src="libs/underscore-min.js"></script>
 <script src="libs/backbone-min.js"></script> -->

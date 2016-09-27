@@ -46,11 +46,15 @@ function getReport(ndbno,cb) {
 
 //*********
 //strorage functions
-function writeStorage(key,data){
-  window.localStorage.setItem(key,JSON.stringify(data));
+
+
+function writeStorage(instance,key,data){
+  instance.setItem(key,data);
 };
 
-function getStorageKey(){
+
+
+function getStorageKey(instance){
   let keys = [];
   for (let i = 0 ; i < window.localStorage.length ;i++){
       keys.push(window.localStorage.key(i));
@@ -58,17 +62,25 @@ function getStorageKey(){
   return keys;
 };
 
-function readStorageData(key){
-  return JSON.parse( window.localStorage.getItem(key));
+
+function readStorageData(instance,key,cb){
+  let data = instance.getItem(key);
+  data.then(cb);
 };
+
+function readAllStorageData(instance,cb){
+  instance.keys().then((key) =>{
+    readStorageData(instance,key,cb);
+  });
+}
 
 function checkIfStorageData(key,data){
 
 }
 
-function deleteStorageData(key,data){
+function deleteStorageData(instance,key,cb){
   //[TODO] for now, this function update key by tempolary data due to localstorage limitation.
-  writeStorage(key,data);
+  instance.removeItem(key,cb);
 }
 
 
@@ -102,29 +114,36 @@ let viewModel = new class {
     this.foodRecode =ko.observableArray([]);
     this.searchQuery = ko.observable("");
     this.selectedDate = ko.observable(UTIL.getCurrentDate());
+    this.foodDataDB = localforage.createInstance({
+      name: "foodDataDB"
+    });
+
+    this.foodRecodeDB = localforage.createInstance({
+      name: "foodRecodeDB"
+    });
   }
 
   init(){
     this.loadFoodData();
     this.loadFoodRecode();
-
   }
 
   loadFoodData(){
-    let key = "foodData";
-    let data = readStorageData(key);
-
-    if (data !== null  && data.length > 0){
-      data.forEach( (item) => {
-         this.foodData.push(item);
-      });
-    }
+    this.foodData([]);
+    // readStorageData(this.foodDataDB,"foodData",(data) => {
+    readAllStorageData(this.foodDataDB,(data) => {
+      console.log(data);
+      if (data !== null  && data.length > 0){
+        data.forEach( (item) => {
+          this.foodData.push(item);
+        });
+      }
+    });
   }
 
   // binds to search Button
   searchFood() {
     this.searchResult([]);
-    // let searchWord = ($('#search-food-text').val());
 
     searchFoodData(this.searchQuery,
       (item)=>{
@@ -149,14 +168,14 @@ let viewModel = new class {
           // currently just checkup tempolary array on the view. because local storage doesn't have function to store multplue keys
           for (let i = 0 ; i < this.foodData().length ; i++){
             if ( this.foodData()[i].ndbno === food.ndbno ){
-              // console.log(i,item.ndbno,food.ndbno);
+              console.log(i,item.ndbno,food.ndbno);
               return;
             }
           }
 
           this.foodData.push(food);
-          writeStorage("foodData",this.foodData());
-
+          writeStorage(this.foodDataDB,food.ndbno,food);
+          this.loadFoodData();
       }
     );
 
@@ -164,11 +183,10 @@ let viewModel = new class {
 
   deleteFoodData(item){
     //[TODO] for now, this function update key by tempolary data due to localstorage limitation.
-    console.log(this.foodData());
-    this.foodData.remove(item);
-    deleteStorageData('foodData',this.foodData())
-
-
+    // this.foodData.remove(item);
+    deleteStorageData(this.foodDataDB,item.ndbno,() =>{
+      this.loadFoodData();
+    });
   }
 
   createTmpFoodData(item){
@@ -181,20 +199,19 @@ let viewModel = new class {
 
   //food recode functions
   loadFoodRecode(dateStr){
-    let key = "foodRecode";
-    let data = readStorageData(key);
+
     let currentDate = dateStr || UTIL.getCurrentDate();
     this.foodRecode([]);
-
-    // this.selectedDate(currentDate);
-    // console.log("dateStr:",dateStr,"currentStr:",currentDate,"this.selectedDate:",this.selectedDate());
-    if ( data !== null && data.length > 0 ) {
-      data.forEach( (item) => {
+    readStorageData(this.foodRecodeDB,"foodRecode",(data) => {
+      if (data !== null  && data.length > 0){
+        data.forEach( (item) => {
         if(item.date === currentDate){
           this.foodRecode.push(item);
         }
       });
-    }
+      }
+
+    });
   }
 
   searchFoodRecode(){
@@ -205,15 +222,16 @@ let viewModel = new class {
     // let today = "2016/09/01";
     item.date = UTIL.getCurrentDate();
     this.foodRecode.push(item);
-    writeStorage('foodRecode',this.foodRecode());
+    writeStorage(this.foodRecodeDB,'foodRecode',this.foodRecode());
   }
+
   deleteFoodRecode(item){
     //[TODO] for now, this function update key by tempolary data due to localstorage limitation.
     // it delete all the data except for current data on the screen. need update
-  
+
     console.log(this.foodRecode());
     this.foodRecode.remove(item);
-    deleteStorageData('foodRecode',this.foodRecode());
+    deleteStorageData(this.foodRecodeDB,'foodRecode',this.foodRecode());
   };
 
 }();
