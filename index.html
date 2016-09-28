@@ -36,6 +36,11 @@
           <div data-bind="click:$parent.storeFoodRecode.bind($parent,$data)">
             <span data-bind="text : ndbno"></span>
             <span><p  data-bind="text : name"></p></span>
+            <div data-bind="foreach : nutrtions.Proximates">
+              <span  data-bind="text : name"></span>
+              <span  data-bind="text : value"></span>
+              <span  data-bind="text : unit"></span>
+            </div>
           </div>
           <button type="button" data-bind="click:$parent.deleteFoodData.bind($parent,$data)" class="btn delete-btin"></button>
         </li>
@@ -44,12 +49,23 @@
 
   <div class="foodrecode-container">
     <input type="date" data-bind="value:selectedDate,valueupdate:'input',event:{change:loadFoodRecode($element.value)}" name="" class="foodrecode-date">
+    <input type=number value="" data-bind="value : amountQuery , valueupdate : 'keyup' ">
     <ul class="foodrecoe-list" data-bind="template : { name:'food-recode', foreach : foodRecode}"></ul>
       <script type="text/html" id="food-recode">
         <li data-bind="" class="food-list-item">
-          <span data-bind="text : date"></span>
+          <!-- <span data-bind="text : date"></span> -->
           <span><p  data-bind="text : name"></p></span>
-          <button type="button" data-bind="click:$parent.deleteFoodRecode.bind($parent,$data)" class="btn delete-btin"></button>
+          <div data-bind="foreach : nutrtions.Proximates">
+            <span  data-bind="text : name"></span>
+            <span  data-bind="text : value * $parent.amount / 100 "></span>
+            <span  data-bind="text : unit"></span>
+          </div>
+          <span data-bind="text : amount"></span>
+          <form data-bind="submit:$parent.updateAmount.bind($parent,$data,$index,$parent.amountQuery())" >
+            <button  type="submit">submit</button>
+          </form>
+          <!-- <button type="button" data-bind="click:$parent.deleteFoodRecode.bind($parent,$data)" class="btn delete-btin"></button> -->
+          <button type="button" data-bind="click:$parent.deleteFoodRecode.bind($parent,$index)" class="btn delete-btin"></button>
         </li>
         </li>
       </script>

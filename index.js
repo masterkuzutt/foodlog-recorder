@@ -24,8 +24,7 @@ function searchFoodData(searchword,cb,cbNodata){
     .error();
 };
 
-// third value is place to store data
-// cb have to accept to arguments.
+// cb have to accept one argument.
 function getReport(ndbno,cb) {
   $.ajax({
     method: "GET",
@@ -48,8 +47,9 @@ function getReport(ndbno,cb) {
 //strorage functions
 
 
-function writeStorage(instance,key,data){
-  instance.setItem(key,data);
+function writeStorage(instance,key,data,cb){
+  //[TODO] add functionality to check key exsist or not
+  instance.setItem(key,data).then(cb);
 };
 
 
@@ -69,8 +69,10 @@ function readStorageData(instance,key,cb){
 };
 
 function readAllStorageData(instance,cb){
-  instance.keys().then((key) =>{
-    readStorageData(instance,key,cb);
+  instance.keys().then((keys) =>{
+    keys.forEach( (key) =>{
+      readStorageData(instance,key,cb);
+    });
   });
 }
 
@@ -79,32 +81,40 @@ function checkIfStorageData(key,data){
 }
 
 function deleteStorageData(instance,key,cb){
-  //[TODO] for now, this function update key by tempolary data due to localstorage limitation.
   instance.removeItem(key,cb);
 }
 
-
+// DataModel class
 class FoodDataModel{
     constructor (){
+      //basicInfo
       this.ndbno = "";
       this.group = "";
       this.name = "";
+      this.nutrtions = [];
+      this.amount = 100;
     }
     set basicData(item){
       this.ndbno  = item.ndbno;
       this.group =  item.group;
       this.name  =  item.name;
-      this.nutrtions = [];
+      this.nutrtions = {};
     }
-
-    set nutritionData(itemList){
-      itemList.forEach((item) => {
-        this.nutrtions.push(item)
+    set nutritionData(data){
+      data.forEach((nutorition) => {
+        this.nutrtions[nutorition.group] = this.nutrtions[nutorition.group] || [] ;
+        this.nutrtions[nutorition.group].push(
+          {
+             name:nutorition.name,
+             unit:nutorition.unit,
+             value:nutorition.value
+          }
+       );
       });
     }
 };
 
-
+//ViewModel class singleton pattern
 let viewModel = new class {
 
   constructor(){
@@ -121,22 +131,21 @@ let viewModel = new class {
     this.foodRecodeDB = localforage.createInstance({
       name: "foodRecodeDB"
     });
+
+    this.amountQuery = ko.observable("");
+
   }
 
   init(){
     this.loadFoodData();
-    this.loadFoodRecode();
+    // this.loadFoodRecode();
   }
 
   loadFoodData(){
     this.foodData([]);
-    // readStorageData(this.foodDataDB,"foodData",(data) => {
     readAllStorageData(this.foodDataDB,(data) => {
-      console.log(data);
-      if (data !== null  && data.length > 0){
-        data.forEach( (item) => {
-          this.foodData.push(item);
-        });
+      if (data !== null  ){
+        this.foodData.push(data);
       }
     });
   }
@@ -155,38 +164,22 @@ let viewModel = new class {
     );
   }
 
-
   storeFoodData(item){
     getReport(item.ndbno ,
       (data) => {
-          let food = new  FoodDataModel();
-          food.basicData = data.report.food;
-          //[TODO] data format is defined by model. don't need to care structure of data here
-
-          food.nutritionData = data.report.food.nutrients
-          //[TODO] check if data is already exist or not. knockout has suitable method i guess
-          // currently just checkup tempolary array on the view. because local storage doesn't have function to store multplue keys
-          for (let i = 0 ; i < this.foodData().length ; i++){
-            if ( this.foodData()[i].ndbno === food.ndbno ){
-              console.log(i,item.ndbno,food.ndbno);
-              return;
-            }
-          }
-
-          this.foodData.push(food);
-          writeStorage(this.foodDataDB,food.ndbno,food);
-          this.loadFoodData();
+        let food = new  FoodDataModel();
+        food.basicData = data.report.food;
+        //[TODO] data format is defined by model. don't need to care structure of data here
+        food.nutritionData = data.report.food.nutrients
+        // [TODO]need some research wtat is happining
+        // bind inside premise object callback , this refer different object
+        writeStorage(this.foodDataDB,food.ndbno,food,this.loadFoodData.bind(this));
       }
     );
-
   }
 
   deleteFoodData(item){
-    //[TODO] for now, this function update key by tempolary data due to localstorage limitation.
-    // this.foodData.remove(item);
-    deleteStorageData(this.foodDataDB,item.ndbno,() =>{
-      this.loadFoodData();
-    });
+    deleteStorageData(this.foodDataDB,item.ndbno,this.loadFoodData.bind(this));
   }
 
   createTmpFoodData(item){
@@ -198,45 +191,45 @@ let viewModel = new class {
   }
 
   //food recode functions
-  loadFoodRecode(dateStr){
-
-    let currentDate = dateStr || UTIL.getCurrentDate();
+  loadFoodRecode(){
+    let currentDate = this.selectedDate();
     this.foodRecode([]);
-    readStorageData(this.foodRecodeDB,"foodRecode",(data) => {
-      if (data !== null  && data.length > 0){
-        data.forEach( (item) => {
-        if(item.date === currentDate){
-          this.foodRecode.push(item);
-        }
-      });
-      }
 
+    readStorageData(this.foodRecodeDB,currentDate,(data) => {
+      if ( data){
+        data.forEach( (item) => {
+          this.foodRecode.push(item);
+         });
+      }
     });
   }
 
   searchFoodRecode(){
-
   }
 
   storeFoodRecode(item){
-    // let today = "2016/09/01";
-    item.date = UTIL.getCurrentDate();
-    this.foodRecode.push(item);
-    writeStorage(this.foodRecodeDB,'foodRecode',this.foodRecode());
+    this.foodRecode.push($.extend({},item));
+    writeStorage(this.foodRecodeDB,this.selectedDate(),this.foodRecode());
   }
 
-  deleteFoodRecode(item){
-    //[TODO] for now, this function update key by tempolary data due to localstorage limitation.
-    // it delete all the data except for current data on the screen. need update
+  updateAmount(item,index,value){
+    // item.amount = num ;
+    item.amount = value;
+    this.foodRecode.splice(index(),1)
+    this.foodRecode.push(item);
+    writeStorage(this.foodRecodeDB,this.selectedDate(),this.foodRecode());
+  }
 
-    console.log(this.foodRecode());
-    this.foodRecode.remove(item);
-    deleteStorageData(this.foodRecodeDB,'foodRecode',this.foodRecode());
+  deleteFoodRecode(index){
+    this.foodRecode.splice(index,1);
+    writeStorage(this.foodRecodeDB,this.selectedDate(),
+                 this.foodRecode(),this.loadFoodRecode.bind(this)
+                );
   };
 
 }();
 
-//reporta
+//report
 
 ko.applyBindings(viewModel);
 viewModel.init();
