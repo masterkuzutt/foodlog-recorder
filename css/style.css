@@ -39,11 +39,11 @@ input {
   font-size: 1em;
 }
 .search-container {
-  width:50%;
+  width:20%;
 }
 
 .fooddata-container {
-  width:50%;
+  width:80%;
 }
 
 .fooddata-list {

@@ -46,13 +46,10 @@ function getReport(ndbno,cb) {
 //*********
 //strorage functions
 
-
 function writeStorage(instance,key,data,cb){
   //[TODO] add functionality to check key exsist or not
   instance.setItem(key,data).then(cb);
 };
-
-
 
 function getStorageKey(instance){
   let keys = [];
@@ -93,6 +90,7 @@ class FoodDataModel{
       this.name = "";
       this.nutrtions = [];
       this.amount = 100;
+
     }
     set basicData(item){
       this.ndbno  = item.ndbno;
@@ -112,6 +110,22 @@ class FoodDataModel{
        );
       });
     }
+    get  proximates () {
+        let proximatesObj ={};
+        //  console.log("inside getter !");
+         this.nutrtions.Proximates.forEach((nt) => {
+            if ( nt.name ==="Water")  proximatesObj.water =  nt.value * this.amount / 100;
+            if ( nt.name ==="Energy" )  proximatesObj.energy =  nt.value * this.amount / 100;
+            if ( nt.name ==="Protein" ) proximatesObj.protain = nt.value * this.amount / 100;
+            if ( nt.name ==="Total lipid (fat)" ) proximatesObj.lipid = nt.value * this.amount / 100;
+            if ( nt.name ==="Carbohydrate, by difference" ) proximatesObj.carbo = nt.value * this.amount / 100;
+            if ( nt.name ==="Fiber, total dietary" ) proximatesObj.fiber = nt.value * this.amount / 100;
+            if ( nt.name ==="Sugars, total" ) proximatesObj.sugar = nt.value * this.amount / 100;
+        });
+        return proximatesObj;
+    };
+
+
 };
 
 //ViewModel class singleton pattern
@@ -121,7 +135,7 @@ let viewModel = new class {
     this.searchResult =ko.observableArray([]);
     this.foodData = ko.observableArray([]);
     this.foodRecodeDay = ko.observableArray([]);
-    this.foodRecode =ko.observableArray([]);
+    this.foodRecode = ko.observableArray([]);
     this.searchQuery = ko.observable("");
     this.selectedDate = ko.observable(UTIL.getCurrentDate());
     this.foodDataDB = localforage.createInstance({
@@ -146,6 +160,7 @@ let viewModel = new class {
     readAllStorageData(this.foodDataDB,(data) => {
       if (data !== null  ){
         this.foodData.push(data);
+        // console.log(data);
       }
     });
   }
@@ -162,6 +177,9 @@ let viewModel = new class {
         this.searchResult.push(this.createTmpFoodData({ndbno:"no recode found"}));
       }
     );
+  }
+  clearSearchData(){
+    this.searchResult([]);
   }
 
   storeFoodData(item){
@@ -198,7 +216,9 @@ let viewModel = new class {
     readStorageData(this.foodRecodeDB,currentDate,(data) => {
       if ( data){
         data.forEach( (item) => {
-          this.foodRecode.push(item);
+          // var tmp = $.extend(new FoodDataModel(),item);
+          // console.log(tmp);
+          this.foodRecode.push($.extend(new FoodDataModel(),item));
          });
       }
     });
@@ -208,7 +228,7 @@ let viewModel = new class {
   }
 
   storeFoodRecode(item){
-    this.foodRecode.push($.extend({},item));
+    this.foodRecode.push($.extend(new FoodDataModel(),item));
     writeStorage(this.foodRecodeDB,this.selectedDate(),this.foodRecode());
   }
 
@@ -225,6 +245,49 @@ let viewModel = new class {
     writeStorage(this.foodRecodeDB,this.selectedDate(),
                  this.foodRecode(),this.loadFoodRecode.bind(this)
                 );
+  };
+
+  getFoodRecodeSum(){
+      let obj = {
+        energy : 0,
+        protain:0,
+        lipid : 0,
+        carbo : 0
+      };
+
+      for ( let i = 0 ; i < this.foodRecode().length ; i++){
+        // console.log("in","proximates",this.foodRecode()[i].proximates,"done");
+        let food = this.foodRecode()[i] ;
+        obj.energy += food.proximates.energy;
+        obj.protain += food.proximates.protain;
+        obj.lipid += food.proximates.lipid;
+        obj.carbo += food.proximates.carbo;
+      };
+      // console.log(obj);
+      return obj;
+  }
+
+  createFoodRecodeBarChart(elm){
+
+    let obj = this.getFoodRecodeSum();
+    // console.log(obj );
+    // let stack = d3.layout.stack();
+    // let dataset = stack(  [
+    //                         {x:obj.energy ,y :0},
+    //                         {x:obj.protain ,y :0},
+    //                         {x:obj.lipid ,y :0},
+    //                         {x:obj.carbo ,y :0}
+    //                     ]
+    //                   );
+    // let svg = d3.select(elm).append("svg")
+    //               .attr("width",500)
+    //               .attr("height",50)
+    //               .selectAll("g")
+    //               .data(dataset)
+    //               .enter()
+    //               .append("g")
+    //               ;
+
   };
 
 }();
