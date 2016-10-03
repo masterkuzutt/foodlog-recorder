@@ -269,25 +269,29 @@ let viewModel = new class {
 
   createFoodRecodeBarChart(elm){
 
-    let obj = this.getFoodRecodeSum();
-    // console.log(obj );
-    // let stack = d3.layout.stack();
-    // let dataset = stack(  [
-    //                         {x:obj.energy ,y :0},
-    //                         {x:obj.protain ,y :0},
-    //                         {x:obj.lipid ,y :0},
-    //                         {x:obj.carbo ,y :0}
-    //                     ]
-    //                   );
-    // let svg = d3.select(elm).append("svg")
-    //               .attr("width",500)
-    //               .attr("height",50)
-    //               .selectAll("g")
-    //               .data(dataset)
-    //               .enter()
-    //               .append("g")
-    //               ;
+    let obj = this.getFoodRecodeSum(),
+        data = [
+          {w:obj.carbo,  c:"red"},
+          {w:obj.protain,c:"green"},
+          {w:obj.lipid,  c:"black"}
+        ];
 
+    if( $(elm).children().length === 0 ){
+      d3.select(elm).append("svg")
+      .attr("width",100)
+      .attr("height",100)
+      .selectAll("rect")
+      .data(data)
+      .enter()
+      .append("rect")
+    }
+
+    d3.select(elm).select("svg").selectAll('rect')
+      .data(data)
+      .attr("width",(d)=> {console.log(d.w);return d.w })
+      .attr("height",(d)=> {return 10})
+      .style("fill",(d)=> {return d.c})
+    ;
   };
 
 }();
