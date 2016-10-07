@@ -271,28 +271,46 @@ let viewModel = new class {
 
     let obj = this.getFoodRecodeSum(),
         data = [
-          {w:obj.carbo,  c:"red"},
-          {w:obj.protain,c:"green"},
-          {w:obj.lipid,  c:"black"}
+          {w:obj.carbo, x:0, c:"red"},
+          {w:obj.protain,x:obj.carbo, c:"green"},
+          {w:obj.lipid,x:obj.carbo + obj.protain, c:"black"}
         ];
+    let sum = obj.carbo + obj.protain + obj.lipid;
+
+    let scale = d3.scaleLinear().domain([0,sum]);
 
     if( $(elm).children().length === 0 ){
       d3.select(elm).append("svg")
-      .attr("width",100)
-      .attr("height",100)
+      .attr("width",'95%')
+      .attr("height",'50px')
+      .attr("class","sammary-graph-svg")
+      .attr("preserveAspectRatio", "xMinYMin meet")
+      // .attr("viewBox", "0 0 1000 100")
+      .style("border", "1px solid black")
+      // .append("g")
       .selectAll("rect")
       .data(data)
       .enter()
       .append("rect")
+      ;
     }
 
-    d3.select(elm).select("svg").selectAll('rect')
+    let svg = d3.select(elm).select("svg");
+    scale.range([0,parseInt(svg.style('width'))]);
+
+    svg.selectAll('rect')
       .data(data)
-      .attr("width",(d)=> {console.log(d.w);return d.w })
-      .attr("height",(d)=> {return 10})
-      .style("fill",(d)=> {return d.c})
+      .attr("width", (d)=> {return scale(d.w) })
+      .attr("height",(d)=> {return 50})
+      .attr("x",(d)=> {return scale(d.x)})
+      .style("fill", (d)=> {return d.c})
     ;
+
+
+
   };
+
+
 
 }();
 

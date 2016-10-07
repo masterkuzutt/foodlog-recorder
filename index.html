@@ -31,40 +31,45 @@
   </div>
 
   <div class="fooddata-container">
-    <ul class="fooddata-list" data-bind="foreach : foodData">
+    <ul class="fooddata-list" data-bind="foreach : foodData>
       <!-- ko if: $index() === 0 -->
         <li class="fooddata-header">
-          <div>
-            <span></span>
-            <span><p></p></span>
-            <div data-bind="foreach : nutrtions.Proximates">
-                <span  data-bind="text : name +'(' + unit +')'"></span>
+          <div class="food-name-div"></div>
+          <div class="food-data-container">
+            <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
+              <span  data-bind="text : name +'(' + unit +')'"></span>
             </div>
           </div>
+          <div class="food-amount-div" ></div>
         </li>
-        <li class="fooddata-header">
-          <div data-bind="click:$parent.storeFoodRecode.bind($parent,$data)">
-            <span data-bind="text : ndbno"></span>
-            <span><p  data-bind="text : name"></p></span>
-            <div data-bind="foreach : nutrtions.Proximates">
+        <!-- <li class="fooddata-header"> -->
+        <li class="fooddata-item">
+            <div class="food-name-div" data-bind="click:$parent.storeFoodRecode.bind($parent,$data)">
+              <span data-bind="text : ndbno"></span>
+              <span><p  data-bind="text : name"></p></span>
+            </div>
+            <div class="food-data-div proximates-div"data-bind="foreach : nutrtions.Proximates">
               <span  data-bind="text : value"></span>
             </div>
-          </div>
-          <button type="button" data-bind="click:$parent.deleteFoodData.bind($parent,$data)" class="btn delete-btin"></button>
+            <div class="food-amount-div">
+              <button type="button" data-bind="click:$parent.deleteFoodData.bind($parent,$data)" class="btn delete-btin"></button>
+            </div>
         </li>
       <!-- /ko  -->
       <!-- ko if: $index() > 0 -->
         <li class="fooddata-item">
-          <div data-bind="click:$parent.storeFoodRecode.bind($parent,$data)">
-            <span data-bind="text : ndbno"></span>
-            <span><p  data-bind="text : name"></p></span>
-            <div data-bind="foreach : nutrtions.Proximates">
+            <div class="food-name-div" data-bind="click:$parent.storeFoodRecode.bind($parent,$data)">
+              <span data-bind="text : ndbno"></span>
+              <span><p  data-bind="text : name"></p></span>
+            </div>
+            <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
               <!-- <span  data-bind="text : name"></span> -->
               <span  data-bind="text : value"></span>
               <!-- <span  data-bind="text : unit"></span> -->
             </div>
-          </div>
-          <button type="button" data-bind="click:$parent.deleteFoodData.bind($parent,$data)" class="btn delete-btin"></button>
+            <div class="food-amount-div">
+              <button type="button" data-bind="click:$parent.deleteFoodData.bind($parent,$data)" class="btn delete-btin"></button>
+            </div>
         </li>
       <!-- /ko  -->
     </ul>
@@ -82,19 +87,19 @@
           <div class="food-name-div">
           </div>
           <div class="food-data-container">
-            <div class="food-data-div" data-bind="foreach : nutrtions.Proximates">
+            <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
                 <span  data-bind="text : name +'(' + unit +')'"></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Lipids">
+            <div class="food-data-div lipids-div" data-bind="foreach : nutrtions.Lipids">
                 <span  data-bind="text : name +'(' + unit +')'"></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Minerals">
+            <div class="food-data-div minerals-div" data-bind="foreach : nutrtions.Minerals">
                 <span  data-bind="text : name +'(' + unit +')'"></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Vitamins">
+            <div class="food-data-div vitamin-div" data-bind="foreach : nutrtions.Vitamins">
                 <span  data-bind="text : name +'(' + unit +')'"></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Other">
+            <div class="food-data-div others-div" data-bind="foreach : nutrtions.Other">
                 <span  data-bind="text : name +'(' + unit +')'"></span>
             </div>
           </div>
@@ -107,19 +112,19 @@
             <span><p  data-bind="text : name"></p></span>
           </div>
           <div class="food-data-container">
-            <div class="food-data-div" data-bind="foreach : nutrtions.Proximates">
+            <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Lipids">
+            <div class="food-data-div lipids-div" data-bind="foreach : nutrtions.Lipids">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Minerals">
+            <div class="food-data-div minerals-div" data-bind="foreach : nutrtions.Minerals">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Vitamins">
+            <div class="food-data-div vitamin-div" data-bind="foreach : nutrtions.Vitamins">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Other">
+            <div class="food-data-div others-div" data-bind="foreach : nutrtions.Other">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
           </div>
@@ -140,19 +145,19 @@
           </div>
 
           <div class="food-data-container">
-            <div class="food-data-div" data-bind="foreach : nutrtions.Proximates">
+            <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Lipids">
+            <div class="food-data-div lipids-div" data-bind="foreach : nutrtions.Lipids">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Minerals">
+            <div class="food-data-div minerals-div" data-bind="foreach : nutrtions.Minerals">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Vitamins">
+            <div class="food-data-div vitamin-div" data-bind="foreach : nutrtions.Vitamins">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
-            <div class="food-data-div" data-bind="foreach : nutrtions.Other">
+            <div class="food-data-div others-div" data-bind="foreach : nutrtions.Other">
               <span  data-bind="text : value * $parent.amount / 100 "></span>
             </div>
           </div>
@@ -171,6 +176,8 @@
     <div class="food-recode-graph-container">
       <div data-bind="enable: createFoodRecodeBarChart($element)" class="ratio-barchart-div">
       </div>
+    </div>
+    <div class="food-monthly-graph-container">
     </div>
   </div>
   <div class="footer-container">
