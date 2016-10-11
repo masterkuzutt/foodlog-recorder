@@ -48,23 +48,24 @@
   <div class="container foodrecode-container">
     <input type="date" data-bind="value:selectedDate,valueupdate:'input',event:{change:loadFoodRecode($element.value)}" name="" class="foodrecode-date">
     <input type=number value="" data-bind="value : amountQuery , valueupdate : 'keyup' ">
+    <table class="table table-striped" >
+      <thead >
+      <!-- ko if :$root.foodRecode().length > 0  -->
+        <tr data-bind="template:{name: 'foodrecode-header-template', foreach : foodRecode()[0].nutrtions.Proximates}">
+        </tr>
+      <!-- /ko  -->
+      </thead>
+      <tbody data-bind="template:{ name : 'fooddata-row-template', foreach : foodRecode}" >
+      </tbody>
+    </table>
+  </div>
 
-    <ul class="list-group-item foodrecode-list" data-bind="foreach : foodRecode">
-      <!-- ko if : $root.foodRecode().length > 0 && $index() == 0 -->
-        <li  class="list-group-item  d-inline foodrecode-list-header" data-bind="template: 'foodrecode-header-template'">
-        </li>
-      <!-- /ko -->
-      <li  class="list-group-item d-inline foodrecode-list-item" data-bind="template : 'foodrecode-row-template'">
-      </li>
-    </ul>
-
-    <div class="food-recode-graph-container">
-      <div data-bind="enable: createFoodRecodeBarChart($element)" class="ratio-barchart-div">
-      </div>
+  <div class="food-recode-graph-container">
+    <div data-bind="enable: createFoodRecodeBarChart($element)" class="ratio-barchart-div">
     </div>
+  </div>
 
-    <div class="food-monthly-graph-container">
-    </div>
+  <div class="food-monthly-graph-container">
   </div>
 
   <div class="container footer-container">
@@ -90,7 +91,6 @@
     <th>NdbNo</th>
     <th>Name</th>
   <!-- /ko -->
-  <!-- <th data-bind="text : name +'(' + unit +')' + ' aaaa ' + $parent.debugPrint($root.foodData()[0].nutrtions.Proximates.length) "></th> -->
   <th data-bind="text : name +'(' + unit +')'  "></th>
   <!-- ko if : ( $index() == ($root.foodData()[0].nutrtions.Proximates.length  - 1 )) -->
     <th></th>
@@ -98,19 +98,54 @@
  </script>
 
  <script type="text/html" id="fooddata-row-template">
-  <tr data-bind="foreach : nutrtions.Proximates">
+  <tr data-bind="foreach : nutrtions.Proximates,click:$parent.storeFoodRecode.bind($parent,$data)">
     <!-- ko if : $index() == 0 -->
       <td data-bind="text:$parent.ndbno"></td>
       <td data-bind="text:$parent.name"></td>
     <!-- /ko -->
       <td data-bind="text : value"></td>
-  <!-- ko if : ( $index() == ($root.foodData()[0].nutrtions.Proximates.length  - 1 )) -->
+    <!-- ko if : ( $index() == ($root.foodData()[0].nutrtions.Proximates.length  - 1 )) -->
       <td>
         <button data-bind="click:$root.deleteFoodData.bind($root,$data)"></button>
       </td>
     <!-- /ko -->
   </tr>
 </script>
+
+<script type="text/html" id="foodrecode-header-template">
+ <!-- ko if : $index() == 0 -->
+   <th>NdbNo</th>
+   <th>Name</th>
+ <!-- /ko -->
+ <th data-bind="text : name +'(' + unit +')'  "></th>
+ <!-- ko if : ( $index() == ($root.foodRecode()[0].nutrtions.Proximates.length  - 1 )) -->
+   <th></th>
+ <!-- /ko -->
+</script>
+
+<!-- <script type="text/html" id="foodrecode-header-template">
+  <div class="food-name-div">
+  </div>
+  <div class="food-data-container">
+    <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
+        <span  data-bind="text : name +'(' + unit +')'"></span>
+    </div>
+    <div class="food-data-div lipids-div" data-bind="foreach : nutrtions.Lipids">
+        <span  data-bind="text : name +'(' + unit +')'"></span>
+    </div>
+    <div class="food-data-div minerals-div" data-bind="foreach : nutrtions.Minerals">
+        <span  data-bind="text : name +'(' + unit +')'"></span>
+    </div>
+    <div class="food-data-div vitamin-div" data-bind="foreach : nutrtions.Vitamins">
+        <span  data-bind="text : name +'(' + unit +')'"></span>
+    </div>
+    <div class="food-data-div others-div" data-bind="foreach : nutrtions.Other">
+        <span  data-bind="text : name +'(' + unit +')'"></span>
+    </div>
+  </div>
+  <div class="food-amount-div">
+  </div>
+</script> -->
 
 <script type="text/html" id="foodrecode-header-template">
   <div class="food-name-div">
@@ -135,6 +170,18 @@
   <div class="food-amount-div">
   </div>
 </script>
+
+ <script type="text/html" id="foodrecode-header-template">
+  <!-- ko if : $index() == 0 -->
+    <th></th>
+  <!-- /ko -->
+  <th data-bind="text : name +'(' + unit +')'  "></th>
+  <!-- ko if : ( $index() == ($root.foodData()[0].nutrtions.Proximates.length  - 1 )) -->
+    <th></th>
+  <!-- /ko -->
+ </script>
+
+
 
 <script type="text/html" id="foodrecode-row-template">
   <div class="food-name-div">

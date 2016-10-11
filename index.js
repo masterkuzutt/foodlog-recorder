@@ -49,6 +49,7 @@ function getReport(ndbno,cb) {
 function writeStorage(instance,key,data,cb){
   //[TODO] add functionality to check key exsist or not
   instance.setItem(key,data).then(cb);
+
 };
 
 function getStorageKey(instance){
@@ -160,7 +161,6 @@ let viewModel = new class {
     readAllStorageData(this.foodDataDB,(data) => {
       if (data !== null  ){
         this.foodData.push(data);
-        // console.log(data);
       }
     });
   }
@@ -183,12 +183,14 @@ let viewModel = new class {
   }
 
   storeFoodData(item){
+
     getReport(item.ndbno ,
       (data) => {
         let food = new  FoodDataModel();
         food.basicData = data.report.food;
         //[TODO] data format is defined by model. don't need to care structure of data here
         food.nutritionData = data.report.food.nutrients
+
         // [TODO]need some research wtat is happining
         // bind inside premise object callback , this refer different object
         writeStorage(this.foodDataDB,food.ndbno,food,this.loadFoodData.bind(this));
