@@ -1,3 +1,5 @@
+/*
+
 * {
   box-sizing: border-box;
   max-width: 100%;
@@ -21,7 +23,6 @@ h3 {
   font-size: 1em; }
 
 p{
-  /*display:block;*/
   overflow: hidden;
   white-space: nowrap;
   width:100%;
@@ -105,3 +106,4 @@ input {
 .sammary-graph-svg{
   margin:auto
 }
+*/

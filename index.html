@@ -4,15 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <title>Document</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" integrity="sha384-2hfp1SzUoho7/TsGGGDaFdsuuDL0LX2hnUp6VkX3CUQ2K4K+xjboZdsXyp4oUHZj" crossorigin="anonymous">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div id="container">
-  <div class="header-container">
+  <div class="container header-container">
     <h1>FoodLog Recorder</h1>
   </div>
 
-  <div class="search-container">
+  <div class="container search-container">
     <div>
       <input type="text" data-bind="value:searchQuery,valueupdate:keyup" name="" id="search-food-text">
       <input type="button" data-bind="click:searchFood" class="btn search-btn" id="search-food-btn">
@@ -30,29 +31,30 @@
     </div>
   </div>
 
-  <div class="fooddata-container">
-    <ul class="fooddata-list" data-bind="foreach : foodData">
-      <!-- ko if :$root.foodData().length > 0 && $index() == 0 -->
-        <li class="fooddata-header" data-bind="template: 'fooddata-header-template'">
-        </li>
+  <div class="container fooddata-container">
+    <table class="table table-striped" >
+      <thead >
+      <!-- ko if :$root.foodData().length > 0  -->
+        <tr data-bind="template:{name: 'fooddata-header-template', foreach : foodData()[0].nutrtions.Proximates}">
+        </tr>
       <!-- /ko  -->
-      <li class="fooddata-item" data-bind="template: 'fooddata-row-template'">
-      </li>
-    </ul>
+      </thead>
+      <tbody data-bind="template:{ name : 'fooddata-row-template', foreach : foodData}" >
+      </tbody>
+    </table>
   </div>
 
 
-  <div class="foodrecode-container">
+  <div class="container foodrecode-container">
     <input type="date" data-bind="value:selectedDate,valueupdate:'input',event:{change:loadFoodRecode($element.value)}" name="" class="foodrecode-date">
     <input type=number value="" data-bind="value : amountQuery , valueupdate : 'keyup' ">
 
-    <ul class="foodrecode-list" data-bind="foreach : foodRecode">
-      <!-- ko if :$root.foodRecode().length > 0 && $index() == 0 -->
-        <li  class="foodrecode-list-header" data-bind="template: 'foodrecode-header-template'">
+    <ul class="list-group-item foodrecode-list" data-bind="foreach : foodRecode">
+      <!-- ko if : $root.foodRecode().length > 0 && $index() == 0 -->
+        <li  class="list-group-item  d-inline foodrecode-list-header" data-bind="template: 'foodrecode-header-template'">
         </li>
-
       <!-- /ko -->
-      <li data-bind="template : 'foodrecode-row-template'" class="foodrecode-list-item">
+      <li  class="list-group-item d-inline foodrecode-list-item" data-bind="template : 'foodrecode-row-template'">
       </li>
     </ul>
 
@@ -65,7 +67,7 @@
     </div>
   </div>
 
-  <div class="footer-container">
+  <div class="container footer-container">
     <p>footer</p>
   </div>
 </div>
@@ -84,28 +86,30 @@
 
 <!-- Knockout templates -->
  <script type="text/html" id="fooddata-header-template">
-  <div class="food-name-div"></div>
-    <div class="food-data-container">
-      <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-      </div>
-    </div>
-  <div class="food-amount-div" ></div>
+  <!-- ko if : $index() == 0 -->
+    <th>NdbNo</th>
+    <th>Name</th>
+  <!-- /ko -->
+  <!-- <th data-bind="text : name +'(' + unit +')' + ' aaaa ' + $parent.debugPrint($root.foodData()[0].nutrtions.Proximates.length) "></th> -->
+  <th data-bind="text : name +'(' + unit +')'  "></th>
+  <!-- ko if : ( $index() == ($root.foodData()[0].nutrtions.Proximates.length  - 1 )) -->
+    <th></th>
+  <!-- /ko -->
  </script>
 
  <script type="text/html" id="fooddata-row-template">
-  <div class="food-name-div" data-bind="click:$parent.storeFoodRecode.bind($parent,$data)">
-    <span data-bind="text : ndbno"></span>
-    <span><p  data-bind="text : name"></p></span>
-  </div>
-  <div class="food-data-container">
-    <div class="food-data-div proximates-div"data-bind="foreach : nutrtions.Proximates">
-      <span  data-bind="text : value"></span>
-    </div>
-  </div>
-  <div class="food-amount-div">
-    <button type="button" data-bind="click:$parent.deleteFoodData.bind($parent,$data)" class="btn delete-btin"></button>
-  </div>
+  <tr data-bind="foreach : nutrtions.Proximates">
+    <!-- ko if : $index() == 0 -->
+      <td data-bind="text:$parent.ndbno"></td>
+      <td data-bind="text:$parent.name"></td>
+    <!-- /ko -->
+      <td data-bind="text : value"></td>
+  <!-- ko if : ( $index() == ($root.foodData()[0].nutrtions.Proximates.length  - 1 )) -->
+      <td>
+        <button data-bind="click:$root.deleteFoodData.bind($root,$data)"></button>
+      </td>
+    <!-- /ko -->
+  </tr>
 </script>
 
 <script type="text/html" id="foodrecode-header-template">

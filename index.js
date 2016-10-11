@@ -310,6 +310,11 @@ let viewModel = new class {
 
   };
 
+  debugPrint (text){
+    console.log(text);
+    return text;
+  }
+
 
 
 }();
