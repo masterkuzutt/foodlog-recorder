@@ -107,3 +107,38 @@ input {
   margin:auto
 }
 */
+
+.text-food-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn{
+  font-family: FontAwesome;
+  color:#F5F5F5;
+  /*border-style: none;*/
+  background: #616161;
+  /*width:50%;*/
+}
+.food-name-col{
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow:ellipsis;
+}
+
+table td[class*=col-], table th[class*=col-] {
+    position: static;
+    display: table-cell;
+    float: none;
+}
+
+.data-cell{
+  text-align:right;
+}
+
+.amount-input{
+  width:100%;
+  text-align:right;
+}

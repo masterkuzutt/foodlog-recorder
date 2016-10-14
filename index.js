@@ -137,6 +137,7 @@ let viewModel = new class {
     this.foodData = ko.observableArray([]);
     this.foodRecodeDay = ko.observableArray([]);
     this.foodRecode = ko.observableArray([]);
+    // ko.track(this.foodRecode);
     this.searchQuery = ko.observable("");
     this.selectedDate = ko.observable(UTIL.getCurrentDate());
     this.foodDataDB = localforage.createInstance({
@@ -146,8 +147,7 @@ let viewModel = new class {
     this.foodRecodeDB = localforage.createInstance({
       name: "foodRecodeDB"
     });
-
-    this.amountQuery = ko.observable("");
+    this.stackchart = "";
 
   }
 
@@ -206,7 +206,7 @@ let viewModel = new class {
     return {
       ndbno:item.ndbno,
       group:item.group || "",
-      name: item.name || ""
+      name: item.name || "",
     }
   }
 
@@ -234,27 +234,23 @@ let viewModel = new class {
     writeStorage(this.foodRecodeDB,this.selectedDate(),this.foodRecode());
   }
 
-  updateAmount(item,index,value){
-    // item.amount = num ;
-    item.amount = value;
-    this.foodRecode.splice(index(),1)
-    this.foodRecode.push(item);
+  updateFoodRecode(item){
+    // this.foodRecode()
+    this.foodRecode.splice(this.foodRecode.indexOf(item),1,$.extend(true,new FoodDataModel(),item));
     writeStorage(this.foodRecodeDB,this.selectedDate(),this.foodRecode());
   }
 
   deleteFoodRecode(index){
     this.foodRecode.splice(index,1);
-    writeStorage(this.foodRecodeDB,this.selectedDate(),
-                 this.foodRecode(),this.loadFoodRecode.bind(this)
-                );
+    writeStorage(this.foodRecodeDB,this.selectedDate(),this.foodRecode());
   };
 
   getFoodRecodeSum(){
       let obj = {
         energy : 0,
-        protain:0,
-        lipid : 0,
-        carbo : 0
+        protain: 0,
+        lipid :  0,
+        carbo :  0
       };
 
       for ( let i = 0 ; i < this.foodRecode().length ; i++){
@@ -265,51 +261,88 @@ let viewModel = new class {
         obj.lipid += food.proximates.lipid;
         obj.carbo += food.proximates.carbo;
       };
-      // console.log(obj);
       return obj;
   }
 
+  // d3 varsion
+
+  // createFoodRecodeBarChart(elm){
+  //   console.log("called");
+  //   let obj = this.getFoodRecodeSum(),
+  //       data = [
+  //         {w:obj.carbo, x:0, c:"red"},
+  //         {w:obj.protain,x:obj.carbo, c:"green"},
+  //         {w:obj.lipid,x:obj.carbo + obj.protain, c:"black"}
+  //       ];
+  //   let sum = obj.carbo + obj.protain + obj.lipid;
+  //
+  //   // let scale = d3.scaleLinear().domain([0,sum]); //for d3.v4
+  //   let scale = d3.scale.linear().domain([0,sum]);
+  //
+  //   if( $(elm).children().length === 0 ){
+  //
+  //     d3.select(elm).append("svg")
+  //     .attr("width",'95%')
+  //     .attr("height",'50px')
+  //     .attr("class","sammary-graph-svg")
+  //     .attr("preserveAspectRatio", "xMinYMin meet")
+  //     // .attr("viewBox", "0 0 1000 100")
+  //     .style("border", "1px solid black")
+  //     // .append("g")
+  //     .selectAll("rect")
+  //     .data(data)
+  //     .enter()
+  //     .append("rect")
+  //     ;
+  //   }
+  //
+  //   let svg = d3.select(elm).select("svg");
+  //   scale.range([0,parseInt(svg.style('width'))]);
+  //
+  //   svg.selectAll('rect')
+  //     .data(data)
+  //     .attr("width", (d)=> {return scale(d.w) })
+  //     .attr("height",(d)=> {return 50})
+  //     .attr("x",(d)=> {return scale(d.x)})
+  //     .style("fill", (d)=> {return d.c})
+  //   ;
+  //
+  // };
+
+
+  //dimple version
   createFoodRecodeBarChart(elm){
 
     let obj = this.getFoodRecodeSum(),
         data = [
-          {w:obj.carbo, x:0, c:"red"},
-          {w:obj.protain,x:obj.carbo, c:"green"},
-          {w:obj.lipid,x:obj.carbo + obj.protain, c:"black"}
-        ];
-    let sum = obj.carbo + obj.protain + obj.lipid;
+          { type:"g", name:"carb",     val: obj.carbo },
+          { type:"g", name:"protain",  val: obj.protain},
+          { type:"g", name:"lipid",    val: obj.lipid},
+          { type:"cal", name:"carb",     val: obj.carbo    *  4},
+          { type:"cal", name:"protain",  val: obj.protain  *  4},
+          { type:"cal", name:"lipid",    val: obj.lipid    *  7}
+        ],
+        sum = data.reduce((p,c)=> {
+          return {val : p.val  +  c.val};
+        });
 
-    let scale = d3.scaleLinear().domain([0,sum]);
+    if( sum.val > 0 ){
+      
+      if( $(elm).children().length === 0 ){
+        let svg = dimple.newSvg(elm, '100%', 400);
+        this.chart = new dimple.chart(svg, data);
+        this.chart.setBounds('10%','10%','80%','80%');
+        this.chart.addPctAxis("x", "val");
+        this.chart.addCategoryAxis("y", "type");
+        this.chart.addSeries("name", dimple.plot.bar);
+        this.chart.addLegend(200, 10, 380, 20, "right");
+        this.chart.series[0].y.addOrderRule(["carb", "protain", "lipid"]);
+      }else{
+        this.chart.data = data;
+      }
 
-    if( $(elm).children().length === 0 ){
-      d3.select(elm).append("svg")
-      .attr("width",'95%')
-      .attr("height",'50px')
-      .attr("class","sammary-graph-svg")
-      .attr("preserveAspectRatio", "xMinYMin meet")
-      // .attr("viewBox", "0 0 1000 100")
-      .style("border", "1px solid black")
-      // .append("g")
-      .selectAll("rect")
-      .data(data)
-      .enter()
-      .append("rect")
-      ;
+      this.chart.draw();
     }
-
-    let svg = d3.select(elm).select("svg");
-    scale.range([0,parseInt(svg.style('width'))]);
-
-    svg.selectAll('rect')
-      .data(data)
-      .attr("width", (d)=> {return scale(d.w) })
-      .attr("height",(d)=> {return 50})
-      .attr("x",(d)=> {return scale(d.x)})
-      .style("fill", (d)=> {return d.c})
-    ;
-
-
-
   };
 
   debugPrint (text){

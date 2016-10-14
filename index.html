@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" integrity="sha384-2hfp1SzUoho7/TsGGGDaFdsuuDL0LX2hnUp6VkX3CUQ2K4K+xjboZdsXyp4oUHZj" crossorigin="anonymous">
+  <script src="https://use.fontawesome.com/d48299b3b3.js"></script>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -15,52 +16,84 @@
 
   <div class="container search-container">
     <div>
-      <input type="text" data-bind="value:searchQuery,valueupdate:keyup" name="" id="search-food-text">
-      <input type="button" data-bind="click:searchFood" class="btn search-btn" id="search-food-btn">
-      <input type="button" data-bind="click:clearSearchData" class="btn refresh-btn" id="search-food-btn">
+      <input type="text" data-bind="value:searchQuery,valueupdate:keyup" name="" >
+      <input type="button" data-bind="click:searchFood" class="btn search-btn" >
+      <input type="button" data-bind="click:clearSearchData" class="btn refresh-btn" >
     </div>
     <div>
-      <ul class="search-list" data-bind="template : { name:'search-data', foreach : searchResult}"></ul>
-        <script type="text/html" id="search-data">
-          <li data-bind="click:$parent.storeFoodData.bind($parent,$data)" class="search-list-item">
-            <h2 data-bind="text : ndbno"></h2>
-            <h3 data-bind="text : group"></h3>
-            <p  data-bind="text : name"></p>
-          </li>
-        </script>
+      <table class="table">
+        <thead class="thead-inverse">
+          <tr>
+            <th>NdbNo</th>
+            <th>Group</th>
+            <th>Name</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody data-bind=" foreach : searchResult">
+          <tr>
+              <td data-bind="text : ndbno"></td>
+              <td data-bind="text : group"></td>
+              <td data-bind="text : name"></td>
+              <td>
+                <input type="button"  data-bind="click:$parent.storeFoodData.bind($parent,$data)" class="btn" value="&#xf063;">
+              </td>
+            </li>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <div class="container fooddata-container">
-    <table class="table table-striped" >
-      <thead >
-      <!-- ko if :$root.foodData().length > 0  -->
-        <tr data-bind="template:{name: 'fooddata-header-template', foreach : foodData()[0].nutrtions.Proximates}">
-        </tr>
-      <!-- /ko  -->
-      </thead>
-      <tbody data-bind="template:{ name : 'fooddata-row-template', foreach : foodData}" >
-      </tbody>
-    </table>
+    <!-- <div class="table-responsive"> -->
+      <table class="table" >
+        <thead class="thead-inverse">
+          <tr>
+            <th class="col-xs-3">Name</th>
+            <th class="col-xs-1">Water(g)</th>
+            <th class="col-xs-1">En(kcal)</th>
+            <th class="col-xs-1">Protain(g)</th>
+            <th class="col-xs-1">Total Fat(g)</th>
+            <th class="col-xs-1">Carbo(g)</th>
+            <th class="col-xs-1">Fiber(g)</th>
+            <th class="col-xs-1">Sugars(g)</th>
+            <th class="col-xs-1"></th>
+            <th class="col-xs-1"></th>
+          </tr>
+        </thead>
+        <tbody data-bind="template:{ name : 'fooddata-row-template', foreach : foodData}" >
+        </tbody>
+      </table>
+    <!-- </div> -->
   </div>
-
 
   <div class="container foodrecode-container">
     <input type="date" data-bind="value:selectedDate,valueupdate:'input',event:{change:loadFoodRecode($element.value)}" name="" class="foodrecode-date">
-    <input type=number value="" data-bind="value : amountQuery , valueupdate : 'keyup' ">
-    <table class="table table-striped" >
-      <thead >
-      <!-- ko if :$root.foodRecode().length > 0  -->
-        <tr data-bind="template:{name: 'foodrecode-header-template', foreach : foodRecode()[0].nutrtions.Proximates}">
-        </tr>
-      <!-- /ko  -->
-      </thead>
-      <tbody data-bind="template:{ name : 'fooddata-row-template', foreach : foodRecode}" >
-      </tbody>
-    </table>
+    <!-- <div class="table-responsive"> -->
+      <table class="table" >
+        <thead class="thead-inverse" >
+          <tr>
+            <th class="col-xs-2">Name</th>
+            <th class="col-xs-1">Water(g)</th>
+            <th class="col-xs-1">En(kcal)</th>
+            <th class="col-xs-1">Protain(g)</th>
+            <th class="col-xs-1">Total Fat(g)</th>
+            <th class="col-xs-1">Carbo(g)</th>
+            <th class="col-xs-1">Fiber(g)</th>
+            <th class="col-xs-1">Sugars(g)</th>
+            <th class="col-xs-1">Amount(g)</th>
+            <th class="col-xs-1"></th>
+            <th class="col-xs-1"></th>
+          </tr>
+        </thead>
+        <tbody data-bind="template:{ name : 'foodrecode-row-template', foreach : foodRecode}" >
+        </tbody>
+      </table>
+    <!-- </div> -->
   </div>
 
-  <div class="food-recode-graph-container">
+  <div class="container food-recode-graph-container">
     <div data-bind="enable: createFoodRecodeBarChart($element)" class="ratio-barchart-div">
     </div>
   </div>
@@ -73,143 +106,61 @@
   </div>
 </div>
 <script src="libs/jquery.min.js"></script>
-<script src="libs/d3.min.js"></script>
+<script src="libs/d3.v3.min.js"></script>
+<script src="libs/dimple.v2.2.0.min.js"></script>
 <script src="libs/localforage.min.js"></script>
 <script src="libs/knockout-3.2.0.js"></script>
 <script src="config.js"></script>
 <script src="util.js"></script>
 <script src="index.js"></script>
 
+
 </body>
 </html>
 
-
-
 <!-- Knockout templates -->
- <script type="text/html" id="fooddata-header-template">
-  <!-- ko if : $index() == 0 -->
-    <th>NdbNo</th>
-    <th>Name</th>
-  <!-- /ko -->
-  <th data-bind="text : name +'(' + unit +')'  "></th>
-  <!-- ko if : ( $index() == ($root.foodData()[0].nutrtions.Proximates.length  - 1 )) -->
-    <th></th>
-  <!-- /ko -->
- </script>
+
 
  <script type="text/html" id="fooddata-row-template">
-  <tr data-bind="foreach : nutrtions.Proximates,click:$parent.storeFoodRecode.bind($parent,$data)">
+  <tr data-bind="foreach : nutrtions.Proximates">
     <!-- ko if : $index() == 0 -->
-      <td data-bind="text:$parent.ndbno"></td>
-      <td data-bind="text:$parent.name"></td>
+      <!-- <td data-bind="text:$parent.ndbno" class="" ></td> -->
+      <td data-bind="text:$parent.name" class="food-name-col" ></td>
     <!-- /ko -->
-      <td data-bind="text : value"></td>
+      <td data-bind="text : value" class="data-cell"></td>
     <!-- ko if : ( $index() == ($root.foodData()[0].nutrtions.Proximates.length  - 1 )) -->
-      <td>
-        <button data-bind="click:$root.deleteFoodData.bind($root,$data)"></button>
+      <td class="">
+        <input type="button" data-bind="click:$root.storeFoodRecode.bind($root,$parent)" class="btn" value="&#xf063;">
+      </td>
+      <td class="">
+        <input type="button" data-bind="click:$root.deleteFoodData.bind($root,$parent)" class="btn" value="&#xf00d;">
       </td>
     <!-- /ko -->
   </tr>
 </script>
 
-<script type="text/html" id="foodrecode-header-template">
- <!-- ko if : $index() == 0 -->
-   <th>NdbNo</th>
-   <th>Name</th>
- <!-- /ko -->
- <th data-bind="text : name +'(' + unit +')'  "></th>
- <!-- ko if : ( $index() == ($root.foodRecode()[0].nutrtions.Proximates.length  - 1 )) -->
-   <th></th>
- <!-- /ko -->
-</script>
 
-<!-- <script type="text/html" id="foodrecode-header-template">
-  <div class="food-name-div">
-  </div>
-  <div class="food-data-container">
-    <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-    <div class="food-data-div lipids-div" data-bind="foreach : nutrtions.Lipids">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-    <div class="food-data-div minerals-div" data-bind="foreach : nutrtions.Minerals">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-    <div class="food-data-div vitamin-div" data-bind="foreach : nutrtions.Vitamins">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-    <div class="food-data-div others-div" data-bind="foreach : nutrtions.Other">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-  </div>
-  <div class="food-amount-div">
-  </div>
-</script> -->
+ <script type="text/html" id="foodrecode-row-template">
+  <tr data-bind="foreach : nutrtions.Proximates ">
+    <!-- ko if : $index() == 0 -->
+      <!-- <td data-bind="text:$parent.ndbno" ></td> -->
+      <td data-bind="text:$parent.name" class="food-name-col" ></td>
+    <!-- /ko -->
+      <td data-bind="text : (value * $parent.amount / 100 ).toFixed(1) , valueupdate : 'afterkeydown'" class="data-cell" ></td>
 
-<script type="text/html" id="foodrecode-header-template">
-  <div class="food-name-div">
-  </div>
-  <div class="food-data-container">
-    <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-    <div class="food-data-div lipids-div" data-bind="foreach : nutrtions.Lipids">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-    <div class="food-data-div minerals-div" data-bind="foreach : nutrtions.Minerals">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-    <div class="food-data-div vitamin-div" data-bind="foreach : nutrtions.Vitamins">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-    <div class="food-data-div others-div" data-bind="foreach : nutrtions.Other">
-        <span  data-bind="text : name +'(' + unit +')'"></span>
-    </div>
-  </div>
-  <div class="food-amount-div">
-  </div>
-</script>
+    <!-- ko if : ( $index() == ($root.foodRecode()[0].nutrtions.Proximates.length  - 1 )) -->
+      <td>
+        <input type="text" data-bind="value:$parent.amount, valueupdate : 'keyup'" class="amount-input">
+      </td>
+      <td>
+        <form data-bind="submit:$root.updateFoodRecode.bind($root,$parent)"  >
+          <button type="submit" class="btn">&#xf01e;</button>
+        </form>
+      </td>
+      <td>
+        <input type="button" data-bind="click:$root.deleteFoodRecode.bind($root,$data)" class="btn" value="&#xf00d;">
+      </td>
 
- <script type="text/html" id="foodrecode-header-template">
-  <!-- ko if : $index() == 0 -->
-    <th></th>
-  <!-- /ko -->
-  <th data-bind="text : name +'(' + unit +')'  "></th>
-  <!-- ko if : ( $index() == ($root.foodData()[0].nutrtions.Proximates.length  - 1 )) -->
-    <th></th>
-  <!-- /ko -->
- </script>
-
-
-
-<script type="text/html" id="foodrecode-row-template">
-  <div class="food-name-div">
-    <span><p  data-bind="text : name"></p></span>
-  </div>
-  <div class="food-data-container">
-    <div class="food-data-div proximates-div" data-bind="foreach : nutrtions.Proximates">
-      <span  data-bind="text : value * $parent.amount / 100 "></span>
-    </div>
-    <div class="food-data-div lipids-div" data-bind="foreach : nutrtions.Lipids">
-      <span  data-bind="text : value * $parent.amount / 100 "></span>
-    </div>
-    <div class="food-data-div minerals-div" data-bind="foreach : nutrtions.Minerals">
-      <span  data-bind="text : value * $parent.amount / 100 "></span>
-    </div>
-    <div class="food-data-div vitamin-div" data-bind="foreach : nutrtions.Vitamins">
-      <span  data-bind="text : value * $parent.amount / 100 "></span>
-    </div>
-    <div class="food-data-div others-div" data-bind="foreach : nutrtions.Other">
-      <span  data-bind="text : value * $parent.amount / 100 "></span>
-    </div>
-  </div>
-
-  <div class="food-amount-div">
-    <span data-bind="text : amount"></span>
-    <form data-bind="submit:$parent.updateAmount.bind($parent,$data,$index,$parent.amountQuery())" >
-      <button  type="submit">submit</button>
-    </form>
-    <button type="button" data-bind="click:$parent.deleteFoodRecode.bind($parent,$index)" class="btn delete-btin"></button>
-  </div>
+    <!-- /ko -->
+  </tr>
 </script>
